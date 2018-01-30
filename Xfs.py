@@ -7,6 +7,7 @@
 #     return add_attribute
 #
 # @command("qq")
+# @command("test")
 # def test(x, y):
 #     print(x + y)
 #

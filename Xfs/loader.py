@@ -12,6 +12,7 @@ def load_module(name, path):
         load_module("foobar", "/home/John/foobar.py")
         Loads "foobar" module located in "/home/John/".
     """
+
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -19,27 +20,51 @@ def load_module(name, path):
 
 
 def get_func_from_module(module):
-    """Gets all the functions from module.
+    """Gets all triggerable functions from module.
 
     Returns a list of tuples with name and function.
     """
+
     command_functions = []
     all_functions = inspect.getmembers(module, inspect.isfunction)
     for func in all_functions:
-        if hasattr(func[1], "command"):
-            command = getattr(func[1], "command")
-            event = getattr(func[1], "event")
-            target = getattr(func[1], "target")
-            nick = getattr(func[1], "nick")
-            owner = getattr(func[1], "owner")
-            command_functions.append((func[0], func[1], command, event, target, nick, owner))
-        # TODO Finish this function
+        if is_triggerable(func[1]):
+            command_functions.append((func[0], func[1]))
 
     return command_functions
 
 
+def get_func_attributes(func):
+    """Gets all the attributes from triggerable functions.
+
+    Returns a tuple with all the attributes inside "func", also "func" has to be a tuple
+    with the function name and the function itself, e.g. "('foo', <function foo at 0x0000023DC051A840>)"
+    Example:
+        print(get_func_attributes(func))
+        ('foo', <function foo at 0x0000023DC051A840>, ['bar'], None, ['PRIVMSG'], None, None, None, None, None)
+
+    The order of the tuple has to stay the same all the time.
+    """
+
+    func_name = func[0][0]
+    command = getattr(func[0][1], "command", None)
+    regexp = getattr(func[0][1], "regexp", None)
+    event = getattr(func[0][1], "event", ["PRIVMSG"])
+    privmsg = getattr(func[0][1], "privmsg", None)  # this means private message not PRIVMSG raw
+    chan = getattr(func[0][1], "chan", None)
+    nick = getattr(func[0][1], "nick", None)
+    host = getattr(func[0][1], "host", None)
+    owner = getattr(func[0][1], "owner", None)
+    return (func_name, func[0][1], command, regexp, event, privmsg, chan, nick, host, owner)
+
+
+def is_triggerable(func):
+    return any(hasattr(func, attr) for attr in ('command', 'regexp'))
+
+
 def check_module(path):
     """Checks if the file from path is a valid module and can be loaded."""
+
     if os.path.isfile(path) and path.endswith(".py") and not os.path.basename(path).startswith("_"):
         return path
     else:
@@ -69,8 +94,8 @@ def enum_modules():
     else:
         return None
 
+
 # a = load_module("test", "modules\\test.py")
-# print(get_func_from_module(a))
-# for x in get_func_from_module(a):
-#     if hasattr(x[1], "t"):
-#         print("are")
+# b = get_func_from_module(a)
+# print(get_func_attributes(b))
+# print(b[0][1](3,5))
