@@ -47,15 +47,17 @@ def get_func_attributes(func):
     """
 
     func_name = func[0][0]
-    command = getattr(func[0][1], "command", None)
-    regexp = getattr(func[0][1], "regexp", None)
-    event = getattr(func[0][1], "event", ["PRIVMSG"])
-    privmsg = getattr(func[0][1], "privmsg", None)  # this means private message not PRIVMSG raw
-    chan = getattr(func[0][1], "chan", None)
-    nick = getattr(func[0][1], "nick", None)
-    host = getattr(func[0][1], "host", None)
-    owner = getattr(func[0][1], "owner", None)
-    return (func_name, func[0][1], command, regexp, event, privmsg, chan, nick, host, owner)
+    func_obj = func[0][1]
+    command = getattr(func_obj, "command", False)
+    regexp = getattr(func_obj, "regexp", False)
+    event = getattr(func_obj, "event", ["PRIVMSG"])
+    priv_msg = getattr(func_obj, "privmsg", False)  # this means private message not PRIVMSG raw
+    chan = getattr(func_obj, "chan", False)
+    nick = getattr(func_obj, "nick", False)
+    host = getattr(func_obj, "host", False)
+    owner = getattr(func_obj, "owner", False)
+    require_thread = getattr(func_obj, "require_owner", False)
+    return (func_name, func.obj, command, regexp, event, priv_msg, chan, nick, host, owner, require_thread)
 
 
 def is_triggerable(func):

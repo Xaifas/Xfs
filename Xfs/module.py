@@ -108,8 +108,11 @@ def require_owner():
     Example:
         @require_owner
     """
-    # TODO Code this
-    pass
+    def add_attribute(func):
+        if not hasattr(func, "owner"):
+            func.owner = True
+        return func
+    return add_attribute
 
 
 def require_privmsg():
@@ -117,5 +120,20 @@ def require_privmsg():
     Example:
         @require_privmsg
     """
-    # TODO Code this
-    pass
+    def add_attribute(func):
+        if not hasattr(func, "priv_msg"):
+            func.priv_msg = True
+        return func
+    return add_attribute
+
+
+def require_thread():
+    """Decorates a function so when it's triggered it starts it's own thread.
+    Example:
+        @require_thread
+    """
+    def add_attribute(func):
+        if not hasattr(func, "require_thread"):
+            func.require_thread = True
+        return func
+    return add_attribute
